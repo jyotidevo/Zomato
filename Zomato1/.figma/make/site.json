@@ -1,0 +1,8 @@
+{
+  "title": "Zomato Clone",
+  "description": "Food ordering demo app",
+  "language": "en",
+  "robots": {
+    "index": true
+  }
+}

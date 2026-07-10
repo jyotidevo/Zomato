@@ -7,5 +7,4 @@ router.post('/signup', createUser);
 router.get('/all', getalluser);
 router.delete('/:id', deleteuser);
 router.post('/login', loginUser);
-
 module.exports = router;

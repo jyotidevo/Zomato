@@ -1,58 +1,21 @@
 import { useState, FormEvent, CSSProperties } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-
-const API_URL = "http://localhost:8003/api/users";
 
 function Login() {
   const [password, setPassword] = useState('')
   const [mobile, setMobile] = useState("")
-  const [message, setMessage] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setMessage("")
-    setError("")
-
-    try {
-      setIsLoading(true)
-      const response = await fetch(`${API_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ mobile, password }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || data.message || "Login failed")
-      }
-
-      localStorage.setItem("zomato-user", JSON.stringify(data.user))
-      setMessage("Login successful")
-      setTimeout(() => navigate("/"), 500)
-    } catch (error) {
-      console.error(error)
-      setError(error instanceof Error ? error.message : "Something went wrong!")
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   return (
     <div style={containerStyle}>
       <h2 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 24, color: "#1c1c1c", marginBottom: 24, textAlign: 'center' }}>Login</h2>
+      <div style={{ color: "#2e7d32", backgroundColor: "#edf7ed", padding: "10px 14px", borderRadius: 8, marginBottom: 16, fontSize: 14 }}>Enter OTP</div>
       <form onSubmit={handleLogin}>
-        {message && <div style={successStyle}>{message}</div>}
-        {error && <div style={errorStyle}>{error}</div>}
-
         <input
-          type='tel'
-          placeholder="Mobile number"
+          type='Mobile Number'
+          placeholder="mobile"
           value={mobile}
           onChange={e => setMobile(e.target.value)}
           required style={inputStyle}
@@ -66,12 +29,9 @@ function Login() {
           style={inputStyle}
         />
         <button type="submit" style={btnStyle}>
-          {isLoading ? "Logging in..." : "Login"}
+          Login
         </button>
       </form>
-      <p style={linkTextStyle}>
-        New to Zomato? <Link to="/signup" style={linkStyle}>Create account</Link>
-      </p>
     </div>
   )
 }
@@ -108,37 +68,6 @@ const btnStyle: CSSProperties = {
   fontSize: '16px',
   fontWeight: 600,
   fontFamily: 'inherit',
-}
-
-const successStyle: CSSProperties = {
-  color: "#2e7d32",
-  backgroundColor: "#edf7ed",
-  padding: "10px 14px",
-  borderRadius: "8px",
-  marginBottom: "12px",
-  fontSize: "14px",
-}
-
-const errorStyle: CSSProperties = {
-  color: "#c62828",
-  backgroundColor: "#ffebee",
-  padding: "10px 14px",
-  borderRadius: "8px",
-  marginBottom: "12px",
-  fontSize: "14px",
-}
-
-const linkTextStyle: CSSProperties = {
-  textAlign: "center",
-  fontSize: "14px",
-  color: "#666",
-  marginTop: "12px",
-}
-
-const linkStyle: CSSProperties = {
-  color: "#e23744",
-  fontWeight: 700,
-  textDecoration: "none",
 }
 
 export default Login;

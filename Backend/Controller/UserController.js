@@ -1,9 +1,11 @@
 const User = require('../Models/UserModel');
+const { generateToken } = require('../MiddleWare/AuthMiddleWare');
 
 //create user
 const createUser = async (req, res) => {
     try {
         const { mobile, password } = req.body;
+
 
         if (!mobile || !password) {
             return res.status(400).json({ error: 'mobile and password are required' });
@@ -15,14 +17,17 @@ const createUser = async (req, res) => {
         }
 
         const newuser = await User.create({ mobile, password });
+        const token = generateToken(newuser);
         res.status(201).json({
             message: 'user created successfully',
             user: {
                 id: newuser.id,
                 mobile: newuser.mobile,
             },
+            token,
         });
     } catch (err) {
+        console.error(err);
         if (err.name === 'SequelizeValidationError') {
             return res.status(400).json({ error: err.errors[0]?.message || 'invalid user data' });
         }
@@ -70,12 +75,14 @@ const loginUser = async (req, res) => {
                 return res.status(401).json({ error: 'invalid password' });
             }
             else {
+                const token = generateToken(user);
                 res.status(200).json({
                     message: 'user logged in successfully',
                     user: {
                         id: user.id,
                         mobile: user.mobile,
                     },
+                    token,
                 });
             }
         }

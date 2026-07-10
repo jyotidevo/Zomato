@@ -1,20 +1,17 @@
-import { useState, FormEvent, CSSProperties } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:8003/api/users";
+interface SignupProps {
+    setData: React.Dispatch<React.SetStateAction<any>>;
+}
 
-function Signup() {
+function Signup({ setData }: SignupProps) {
     const [mobile, setMobile] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setMessage("");
-        setError("");
 
         const userData = {
             mobile,
@@ -22,8 +19,7 @@ function Signup() {
         };
 
         try {
-            setIsLoading(true);
-            const response = await fetch(`${API_URL}/signup`, {
+            const response = await fetch("http://localhost:8003/api/users/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -37,15 +33,25 @@ function Signup() {
                 throw new Error(data.error || data.message || "Signup failed");
             }
 
-            setMessage("Signup successful. Please login.");
+            console.log(data);
+            alert("Signup Successful");
+            
+            // Store user and token
+            localStorage.setItem("user", JSON.stringify(data.user));
+            localStorage.setItem("token", data.token);
+            
+            if (setData) {
+                setData((prevData: any) => ({ ...prevData, isLoggedIn: true }));
+            }
+
             setMobile("");
             setPassword("");
-            setTimeout(() => navigate("/login"), 800);
+            
+            // Redirect to home
+            navigate("/");
         } catch (error) {
             console.error(error);
-            setError(error instanceof Error ? error.message : "Something went wrong!");
-        } finally {
-            setIsLoading(false);
+            alert("Something went wrong!");
         }
     };
 
@@ -64,10 +70,7 @@ function Signup() {
                 Signup
             </h2>
 
-            <form onSubmit={handleSignup}>
-                {message && <div style={successStyle}>{message}</div>}
-                {error && <div style={errorStyle}>{error}</div>}
-
+            <form onSubmit={handleSubmit}>
                 <input
                     type="tel"
                     placeholder="Enter Mobile Number"
@@ -87,12 +90,9 @@ function Signup() {
                 />
 
                 <button type="submit" style={btnStyle}>
-                    {isLoading ? "Creating account..." : "Signup"}
+                    Signup
                 </button>
             </form>
-            <p style={linkTextStyle}>
-                Already have an account? <Link to="/login" style={linkStyle}>Login</Link>
-            </p>
         </div>
     );
 }
@@ -129,37 +129,6 @@ const btnStyle: CSSProperties = {
     fontSize: "16px",
     fontWeight: 600,
     fontFamily: "inherit",
-};
-
-const successStyle: CSSProperties = {
-    color: "#2e7d32",
-    backgroundColor: "#edf7ed",
-    padding: "10px 14px",
-    borderRadius: "8px",
-    marginBottom: "12px",
-    fontSize: "14px",
-};
-
-const errorStyle: CSSProperties = {
-    color: "#c62828",
-    backgroundColor: "#ffebee",
-    padding: "10px 14px",
-    borderRadius: "8px",
-    marginBottom: "12px",
-    fontSize: "14px",
-};
-
-const linkTextStyle: CSSProperties = {
-    textAlign: "center",
-    fontSize: "14px",
-    color: "#666",
-    marginTop: "12px",
-};
-
-const linkStyle: CSSProperties = {
-    color: "#e23744",
-    fontWeight: 700,
-    textDecoration: "none",
 };
 
 export default Signup;

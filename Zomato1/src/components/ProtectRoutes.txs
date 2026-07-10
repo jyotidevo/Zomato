@@ -1,0 +1,21 @@
+
+import {uselocatio  Navigate} from "react-router-dom";
+
+type ProtectRoutesProps = {
+    isLoggedIn: boolean;
+    children: React.ReactNode;
+}
+function ProtectRoutes({isLoggedIn, children }: ProtectRoutesProps) {
+    const location = useLocation();
+   return(
+    <div>
+        if  (!isLoggedIn){
+            <Navigate to="/login" state={{from: location}} replace />
+        }
+        
+        return children;
+    </div>
+   )
+}   
+
+export default ProtectRoutes;   

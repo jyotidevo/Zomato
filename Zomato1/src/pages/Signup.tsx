@@ -19,7 +19,7 @@ function Signup({ setData }: SignupProps) {
         };
 
         try {
-            const response = await fetch("http://localhost:8003/api/users/signup", {
+            const response = await fetch("http://zomato-production-7ecc.up.railway.app/api/users/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -35,18 +35,18 @@ function Signup({ setData }: SignupProps) {
 
             console.log(data);
             alert("Signup Successful");
-            
+
             // Store user and token
             localStorage.setItem("user", JSON.stringify(data.user));
             localStorage.setItem("token", data.token);
-            
+
             if (setData) {
                 setData((prevData: any) => ({ ...prevData, isLoggedIn: true }));
             }
 
             setMobile("");
             setPassword("");
-            
+
             // Redirect to home
             navigate("/");
         } catch (error) {

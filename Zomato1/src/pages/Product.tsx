@@ -1,7 +1,7 @@
 import { useState, useEffect, CSSProperties } from "react";
 
-const API_URL = "http://localhost:8003/api/product";
-const IMAGE_BASE = "http://localhost:8003/uploads/";
+const API_URL = "https://zomato-production-7ecc.up.railway.app/api/product";
+const IMAGE_BASE = "https://zomato-production-7ecc.up.railway.app/uploads/";
 
 interface Product {
     id: number;

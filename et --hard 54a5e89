@@ -1,0 +1,10 @@
+[33mf7c6c2c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: remove node_modules from git tracking, add railway.json and update .gitignore
+[33m460ab16[m fix: update CORS, login API integration, and error handling
+[33m0d915bd[m feat: add vercel.json to enable single-page application routing rewrites
+[33m77409b4[m feat: implement user signup page with authentication API integration
+[33m680675c[m feat: initialize backend project with Express, Sequelize, and MySQL configuration
+[33m54a5e89[m feat: implement signup page with mobile and password authentication logic
+[33m1629db8[m feat: initialize backend project with Express server, Sequelize ORM configuration, and core API routing
+[33mcdcdf86[m feat: implement user authentication middleware, define user routes, and create login UI component
+[33m27f4045[m feat: implement UserController, ProductRoutes, and initialize project dependencies
+[33mfb81be4[m first commit

@@ -31,6 +31,6 @@ const Product = db.define('Product', {
         type: DataTypes.TEXT,
         allowNull: true,
     }
-});
+}, { tableName: 'Products' });
 
 module.exports = Product;

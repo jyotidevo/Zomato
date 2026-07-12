@@ -29,7 +29,7 @@ const User = db.define(
         },
     },
     {
-        timestamps: true,
+        timestamps: true, tableName: 'Users'
     }
 );
 

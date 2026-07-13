@@ -19,7 +19,7 @@ function Signup({ setData }: SignupProps) {
         };
 
         try {
-            const response = await fetch("https://zomato-production-7ecc.up.railway.app/api/users/signup", {
+            const response = await fetch("https://zomato-production-6aa4.up.railway.app/api/users/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

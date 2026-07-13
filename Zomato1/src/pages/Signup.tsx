@@ -1,5 +1,6 @@
 import { useState, CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 interface SignupProps {
     setData: React.Dispatch<React.SetStateAction<any>>;
@@ -8,6 +9,8 @@ interface SignupProps {
 function Signup({ setData }: SignupProps) {
     const [mobile, setMobile] = useState("");
     const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -16,10 +19,12 @@ function Signup({ setData }: SignupProps) {
         const userData = {
             mobile,
             password,
+            username,
+            email,
         };
 
         try {
-            const response = await fetch("https://zomato-production-816f.up.railway.app/api/users/signup", {
+            const response = await fetch(`${API_BASE_URL}/api/users/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -46,12 +51,14 @@ function Signup({ setData }: SignupProps) {
 
             setMobile("");
             setPassword("");
+            setUsername("");
+            setEmail("");
 
             // Redirect to home
             navigate("/");
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Something went wrong!");
+            alert(error.message || "Something went wrong!");
         }
     };
 
@@ -71,6 +78,24 @@ function Signup({ setData }: SignupProps) {
             </h2>
 
             <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Enter Full Name"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    style={inputStyle}
+                />
+
+                <input
+                    type="email"
+                    placeholder="Enter Email Address (e.g. admin@zomato.com)"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    style={inputStyle}
+                />
+
                 <input
                     type="tel"
                     placeholder="Enter Mobile Number"

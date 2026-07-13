@@ -64,6 +64,21 @@ export default function Navbar() {
             >
               Orders
             </Link>
+            {(() => {
+              try {
+                const user = JSON.parse(localStorage.getItem("user") || "{}");
+                if (user?.isAdmin) return (
+                  <Link
+                    to="/admin"
+                    className="hidden md:block text-sm font-bold text-purple-600 hover:text-purple-700 transition-colors px-3 py-1 rounded-lg"
+                    style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.3)" }}
+                  >
+                    🛡️ Admin
+                  </Link>
+                );
+              } catch {}
+              return null;
+            })()}
             {localStorage.getItem("token") ? (
               <button
                 onClick={() => {

@@ -1,5 +1,6 @@
 import { useState, FormEvent, CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 interface LoginProps {
   setData?: React.Dispatch<React.SetStateAction<{ isLoggedIn: boolean }>>
@@ -7,7 +8,7 @@ interface LoginProps {
 
 function Login({ setData }: LoginProps) {
   const [password, setPassword] = useState('')
-  const [mobile, setMobile] = useState("")
+  const [identifier, setIdentifier] = useState("") // Can be mobile or email
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
@@ -15,13 +16,14 @@ function Login({ setData }: LoginProps) {
     e.preventDefault()
     setLoading(true)
 
+    const isEmail = identifier.includes("@");
     const userData = {
-      mobile,
+      [isEmail ? "email" : "mobile"]: identifier,
       password,
     }
 
     try {
-      const response = await fetch("https://zomato-production-816f.up.railway.app/api/users/login", {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +47,7 @@ function Login({ setData }: LoginProps) {
         setData((prevData: any) => ({ ...prevData, isLoggedIn: true }))
       }
 
-      setMobile("")
+      setIdentifier("")
       setPassword("")
       navigate("/")
     } catch (error: any) {
@@ -59,13 +61,13 @@ function Login({ setData }: LoginProps) {
   return (
     <div style={containerStyle}>
       <h2 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 24, color: "#1c1c1c", marginBottom: 24, textAlign: 'center' }}>Login</h2>
-      <div style={{ color: "#2e7d32", backgroundColor: "#edf7ed", padding: "10px 14px", borderRadius: 8, marginBottom: 16, fontSize: 14 }}>Enter OTP</div>
+      <div style={{ color: "#2e7d32", backgroundColor: "#edf7ed", padding: "10px 14px", borderRadius: 8, marginBottom: 16, fontSize: 14 }}>Enter Credentials</div>
       <form onSubmit={handleLogin}>
         <input
-          type='tel'
-          placeholder="mobile"
-          value={mobile}
-          onChange={e => setMobile(e.target.value)}
+          type='text'
+          placeholder="Mobile Number or Email"
+          value={identifier}
+          onChange={e => setIdentifier(e.target.value)}
           required style={inputStyle}
           disabled={loading}
         />

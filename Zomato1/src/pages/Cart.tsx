@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
+import { API_BASE_URL } from "../config";
 
 const PROMO_CODES: Record<string, number> = {
   ZOMATO50: 50,
@@ -31,9 +32,58 @@ export default function Cart() {
     }
   };
 
-  const placeOrder = () => {
-    clearCart();
-    navigate("/orders?new=1");
+  const placeOrder = async () => {
+    try {
+      const userStr = localStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+      
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to place an order.");
+        navigate("/login");
+        return;
+      }
+
+      const orderData = {
+        userId: user ? user.id : 1,
+        restaurantName: items[0]?.restaurantName || "Zomato Kitchen",
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        totalPrice,
+        deliveryFee,
+        platformFee: 5,
+        gst: taxes,
+        tip: 0,
+        grandTotal: finalTotal,
+        address,
+        paymentMethod: "Card / Wallet"
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to place order");
+      }
+
+      clearCart();
+      navigate(`/orders?orderId=${data.orderId}`);
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || "Something went wrong while placing your order.");
+    }
   };
 
   if (items.length === 0) {

@@ -18,7 +18,15 @@ const User = db.define(
                 len: [10, 10],
             },
         },
-
+        email: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true,
+        },
+        username: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         password: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -26,6 +34,14 @@ const User = db.define(
         image: {
             type: DataTypes.TEXT,
             allowNull: true,
+        },
+        isAdmin: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+        isBlocked: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         },
     },
     {

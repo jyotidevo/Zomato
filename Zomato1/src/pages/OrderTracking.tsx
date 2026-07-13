@@ -1,9 +1,10 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { API_BASE_URL } from "../config";
 
 const STEPS = [
   { id: 1, label: "Order Placed", icon: "✅", desc: "Your order has been received" },
-  { id: 2, label: "Restaurant Confirmed", icon: "🍳", desc: "Restaurant is preparing your food" },
+  { id: 2, label: "Preparing", icon: "🍳", desc: "Restaurant is preparing your food" },
   { id: 3, label: "Out for Delivery", icon: "🛵", desc: "Your rider is on the way" },
   { id: 4, label: "Delivered", icon: "🎉", desc: "Enjoy your meal!" },
 ];
@@ -38,20 +39,84 @@ const PAST_ORDERS = [
   },
 ];
 
+interface DbOrder {
+  orderId: string;
+  restaurantName: string;
+  grandTotal: number;
+  status: string;
+  createdAt: string;
+}
+
 export default function OrderTracking() {
   const [searchParams] = useSearchParams();
-  const isNew = searchParams.get("new") === "1";
-  const [currentStep, setCurrentStep] = useState(isNew ? 1 : 0);
+  const orderId = searchParams.get("orderId");
+  const isNew = searchParams.get("new") === "1" || !!orderId;
+  
+  const [currentStep, setCurrentStep] = useState(orderId ? 1 : (isNew ? 1 : 0));
   const [eta, setEta] = useState(38);
+  const [dbOrder, setDbOrder] = useState<DbOrder | null>(null);
 
+  // Status mapping
+  const getStepFromStatus = (status: string) => {
+    switch (status) {
+      case "Order Placed": return 1;
+      case "Preparing": return 2;
+      case "Out for Delivery": return 3;
+      case "Delivered": return 4;
+      case "Cancelled": return 0;
+      case "Refunded": return 0;
+      default: return 1;
+    }
+  };
+
+  const getEtaFromStep = (step: number) => {
+    switch (step) {
+      case 1: return 38;
+      case 2: return 28;
+      case 3: return 12;
+      case 4: return 0;
+      default: return 0;
+    }
+  };
+
+  // Poll database if orderId is present
   useEffect(() => {
-    if (!isNew) return;
+    if (!orderId) return;
+
+    const fetchOrderStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDbOrder(data);
+          const step = getStepFromStatus(data.status);
+          setCurrentStep(step);
+          setEta(getEtaFromStep(step));
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    };
+
+    fetchOrderStatus(); // initial fetch
+    const interval = setInterval(fetchOrderStatus, 5000);
+    return () => clearInterval(interval);
+  }, [orderId]);
+
+  // Fallback local simulation if no orderId, just generic isNew
+  useEffect(() => {
+    if (orderId || !isNew) return;
     const timers: ReturnType<typeof setTimeout>[] = [];
     timers.push(setTimeout(() => { setCurrentStep(2); setEta(32); }, 3000));
     timers.push(setTimeout(() => { setCurrentStep(3); setEta(18); }, 7000));
     timers.push(setTimeout(() => { setCurrentStep(4); setEta(0); }, 14000));
     return () => timers.forEach(clearTimeout);
-  }, [isNew]);
+  }, [isNew, orderId]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -64,19 +129,33 @@ export default function OrderTracking() {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-red-100 text-xs font-medium uppercase tracking-widest mb-1">Active Order</p>
+                  <p className="text-red-100 text-xs font-medium uppercase tracking-widest mb-1">
+                    {dbOrder ? `Order Status: ${dbOrder.status}` : "Active Order"}
+                  </p>
                   <h1 className="text-2xl font-black">
-                    {currentStep < 4 ? `Arriving in ${eta} min` : "Order Delivered! 🎉"}
+                    {dbOrder && (dbOrder.status === "Cancelled" || dbOrder.status === "Refunded")
+                      ? `Order ${dbOrder.status} ❌`
+                      : currentStep < 4
+                      ? `Arriving in ${eta} min`
+                      : "Order Delivered! 🎉"}
                   </h1>
-                  <p className="text-red-100 text-sm mt-1">Order #ORD9934 • Buhari Hotel</p>
+                  <p className="text-red-100 text-sm mt-1">
+                    Order #{dbOrder ? dbOrder.orderId : "ORD9934"} • {dbOrder ? dbOrder.restaurantName : "Buhari Hotel"}
+                  </p>
                 </div>
                 <div className="text-5xl">
-                  {currentStep < 3 ? "🍳" : currentStep === 3 ? "🛵" : "🎉"}
+                  {dbOrder && (dbOrder.status === "Cancelled" || dbOrder.status === "Refunded")
+                    ? "❌"
+                    : currentStep < 3
+                    ? "🍳"
+                    : currentStep === 3
+                    ? "🛵"
+                    : "🎉"}
                 </div>
               </div>
 
               {/* Progress bar */}
-              {currentStep < 4 && (
+              {currentStep > 0 && currentStep < 4 && (
                 <div className="mt-5 bg-white/20 rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-yellow-300 h-2 rounded-full transition-all duration-1000"

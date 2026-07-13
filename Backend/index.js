@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 8003;
 
 const UserRoute = require('./Routes/UserRoutes');
 const ProductRoute = require('./Routes/ProductRoutes');
+const OrderRoute = require('./Routes/OrderRoutes');
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', UserRoute);
 app.use('/api/product', ProductRoute);
+app.use('/api/orders', OrderRoute);
 
 const startServer = async () => {
     try {

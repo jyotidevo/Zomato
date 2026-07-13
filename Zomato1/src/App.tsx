@@ -10,6 +10,8 @@ import OrderTracking from "./pages/OrderTracking";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Product from "./pages/Product";
+import AdminPanel from "./pages/AdminPanel";
+import AdminLogin from "./pages/AdminLogin";
 
 export default function App() {
   const [data, setData] = useState({ isLoggedIn: !!localStorage.getItem("token") });
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/orders" element={<OrderTracking />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin-login" element={<AdminLogin setData={setData} />} />
         </Routes>
       </div>
     </CartProvider>

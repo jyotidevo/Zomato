@@ -1,11 +1,59 @@
 import { useState, FormEvent, CSSProperties } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-function Login() {
+interface LoginProps {
+  setData?: React.Dispatch<React.SetStateAction<{ isLoggedIn: boolean }>>
+}
+
+function Login({ setData }: LoginProps) {
   const [password, setPassword] = useState('')
   const [mobile, setMobile] = useState("")
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setLoading(true)
+
+    const userData = {
+      mobile,
+      password,
+    }
+
+    try {
+      const response = await fetch("https://zomato-production-816f.up.railway.app/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || "Login failed")
+      }
+
+      console.log(data)
+      alert("Login Successful")
+
+      localStorage.setItem("user", JSON.stringify(data.user))
+      localStorage.setItem("token", data.token)
+
+      if (setData) {
+        setData((prevData: any) => ({ ...prevData, isLoggedIn: true }))
+      }
+
+      setMobile("")
+      setPassword("")
+      navigate("/")
+    } catch (error: any) {
+      console.error(error)
+      alert(error.message || "Something went wrong during login!")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -14,11 +62,12 @@ function Login() {
       <div style={{ color: "#2e7d32", backgroundColor: "#edf7ed", padding: "10px 14px", borderRadius: 8, marginBottom: 16, fontSize: 14 }}>Enter OTP</div>
       <form onSubmit={handleLogin}>
         <input
-          type='Mobile Number'
+          type='tel'
           placeholder="mobile"
           value={mobile}
           onChange={e => setMobile(e.target.value)}
           required style={inputStyle}
+          disabled={loading}
         />
         <input
           type="password"
@@ -27,9 +76,10 @@ function Login() {
           onChange={e => setPassword(e.target.value)}
           required
           style={inputStyle}
+          disabled={loading}
         />
-        <button type="submit" style={btnStyle}>
-          Login
+        <button type="submit" style={btnStyle} disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>

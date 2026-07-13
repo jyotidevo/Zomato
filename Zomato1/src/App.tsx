@@ -12,7 +12,7 @@ import Signup from "./pages/Signup";
 import Product from "./pages/Product";
 
 export default function App() {
-  const [data, setData] = useState({ isLoggedIn: false });
+  const [data, setData] = useState({ isLoggedIn: !!localStorage.getItem("token") });
 
   // Prevent unused warnings by referencing variables or using comments
   console.log("Auth state:", { data });
@@ -23,7 +23,7 @@ export default function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login setData={setData} />} />
           <Route path="/signup" element={<Signup setData={setData} />} />
           <Route path="/product" element={<Product />} />
           <Route path="/restaurants" element={<Restaurants />} />

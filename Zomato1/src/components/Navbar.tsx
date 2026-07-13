@@ -64,18 +64,33 @@ export default function Navbar() {
             >
               Orders
             </Link>
-            <Link
-              to="/login"
-              className="hidden sm:block text-sm font-medium text-gray-600 hover:text-red-500 transition-colors px-2 py-1"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="hidden sm:block text-sm font-semibold text-red-500 hover:text-red-600 transition-colors px-2 py-1"
-            >
-              Signup
-            </Link>
+            {localStorage.getItem("token") ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("user");
+                  navigate("/login");
+                }}
+                className="hidden sm:block text-sm font-medium text-gray-600 hover:text-red-500 transition-colors px-2 py-1"
+              >
+                Logout
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="hidden sm:block text-sm font-medium text-gray-600 hover:text-red-500 transition-colors px-2 py-1"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="hidden sm:block text-sm font-semibold text-red-500 hover:text-red-600 transition-colors px-2 py-1"
+                >
+                  Signup
+                </Link>
+              </>
+            )}
             <Link
               to="/cart"
               className="relative flex items-center gap-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
